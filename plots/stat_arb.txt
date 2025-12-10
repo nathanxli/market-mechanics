@@ -1,0 +1,124 @@
+All
+=== Distance-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 142
+Total profit        : 0.0722
+Final equity        : 1.0722
+CAGR                : 0.90%
+Sharpe (annual)     : 0.54
+Max drawdown        : -3.43%
+Average utilization   : 63.07%
+Avg active pairs/day  : 6.31
+
+=== Cointegration-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 148
+Total profit        : 0.0855
+Final equity        : 1.0855
+CAGR                : 1.06%
+Sharpe (annual)     : 0.27
+Max drawdown        : -8.96%
+Average utilization   : 79.82%
+Avg active pairs/day  : 7.98
+
+=== OU time-series pairs trading ===
+Trading days        : 1960
+Number of trades    : 211
+Total profit        : 0.0403
+Final equity        : 1.0403
+CAGR                : 0.51%
+Sharpe (annual)     : 0.31
+Max drawdown        : -2.78%
+
+Reit
+=== Distance-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 136
+Total profit        : 0.0438
+Final equity        : 1.0438
+CAGR                : 0.55%
+Sharpe (annual)     : 0.24
+Max drawdown        : -5.56%
+Average utilization   : 55.71%
+Avg active pairs/day  : 5.57
+
+=== Cointegration-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 142
+Total profit        : 0.2055
+Final equity        : 1.2055
+CAGR                : 2.43%
+Sharpe (annual)     : 0.43
+Max drawdown        : -14.95%
+Average utilization   : 75.42%
+Avg active pairs/day  : 7.54
+
+=== OU time-series pairs trading ===
+Trading days        : 1960
+...
+Final equity        : 1.0954
+CAGR                : 1.18%
+Sharpe (annual)     : 0.55
+Max drawdown        : -2.68%
+
+Utilities
+=== Distance-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 139
+Total profit        : 0.0908
+Final equity        : 1.0908
+CAGR                : 1.12%
+Sharpe (annual)     : 0.72
+Max drawdown        : -2.31%
+Average utilization   : 61.65%
+Avg active pairs/day  : 6.16
+
+=== Cointegration-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 145
+Total profit        : 0.0830
+Final equity        : 1.0830
+CAGR                : 1.03%
+Sharpe (annual)     : 0.29
+Max drawdown        : -5.64%
+Average utilization   : 75.44%
+Avg active pairs/day  : 7.54
+
+=== OU time-series pairs trading ===
+Trading days        : 1960
+...
+Final equity        : 1.0061
+CAGR                : 0.08%
+Sharpe (annual)     : 0.06
+Max drawdown        : -2.89%
+
+Staples
+=== Distance-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 140
+Total profit        : 0.2048
+Final equity        : 1.2048
+CAGR                : 2.43%
+Sharpe (annual)     : 1.00
+Max drawdown        : -5.96%
+Average utilization   : 62.53%
+Avg active pairs/day  : 6.25
+
+=== Cointegration-based pairs trading ===
+Trading days        : 1959
+Number of trades    : 142
+Total profit        : 0.2308
+Final equity        : 1.2308
+CAGR                : 2.71%
+Sharpe (annual)     : 0.50
+Max drawdown        : -9.88%
+Average utilization   : 76.56%
+Avg active pairs/day  : 7.66
+
+=== OU time-series pairs trading ===
+Trading days        : 1960
+...
+Final equity        : 1.0908
+CAGR                : 1.12%
+Sharpe (annual)     : 0.40
+Max drawdown        : -7.56%
