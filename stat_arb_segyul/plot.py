@@ -208,45 +208,143 @@ def plot_spread_with_signals(prices, pair_info, trading_window,
     
     return ax
 
-def plot_strategy_comparison(dist_returns, coint_returns, dist_util=None, coint_util=None):
+def plot_strategy_comparison(*returns_series, names=None, utilizations=None):
     """
-    Create a comprehensive comparison plot of distance vs cointegration strategies.
+    Create a comprehensive comparison plot of multiple strategies.
     
     Parameters:
     -----------
-    dist_returns : pd.Series
-        Daily returns for distance strategy
-    coint_returns : pd.Series
-        Daily returns for cointegration strategy
-    dist_util : pd.Series, optional
-        Utilization for distance strategy
-    coint_util : pd.Series, optional
-        Utilization for cointegration strategy
+    *returns_series : pd.Series
+        Variable number of daily returns series for different strategies
+    names : list of str, optional
+        Strategy names/labels. If None, defaults to "Strategy 1", "Strategy 2", etc.
+    utilizations : list of pd.Series, optional
+        Optional utilization series for each strategy. Must match length of returns_series.
+        If provided, utilization plots will be included.
+    
+    Examples:
+    --------
+    # Compare two strategies
+    plot_strategy_comparison(dist_returns, coint_returns, 
+                            names=['Distance', 'Cointegration'],
+                            utilizations=[dist_util, coint_util])
+    
+    # Compare multiple strategies
+    plot_strategy_comparison(dist_returns, coint_returns, ou_returns, benchmark_returns,
+                            names=['Distance', 'Cointegration', 'OU', 'Benchmark'])
     """
+    num_strategies = len(returns_series)
+    if num_strategies == 0:
+        raise ValueError("At least one returns series must be provided")
+    
+    # Default names if not provided
+    if names is None:
+        names = [f"Strategy {i+1}" for i in range(num_strategies)]
+    elif len(names) != num_strategies:
+        raise ValueError(f"Number of names ({len(names)}) must match number of strategies ({num_strategies})")
+    
+    # Validate utilizations if provided
+    if utilizations is not None:
+        if len(utilizations) != num_strategies:
+            raise ValueError(f"Number of utilizations ({len(utilizations)}) must match number of strategies ({num_strategies})")
+        has_utilization = any(util is not None for util in utilizations)
+    else:
+        has_utilization = False
+        utilizations = [None] * num_strategies
+    
+    # Determine grid layout based on number of strategies
+    if num_strategies == 1:
+        rows = 2 if has_utilization else 2
+        cols = 1
+    elif num_strategies == 2:
+        rows = 3 if has_utilization else 2
+        cols = 2
+    else:
+        # For 3+ strategies, use a more compact layout
+        rows = 3 if has_utilization else 2
+        cols = 2
+    
     fig = plt.figure(figsize=(16, 10))
-    gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.3)
+    gs = fig.add_gridspec(rows, cols, hspace=0.3, wspace=0.3)
     
-    # Equity curves
+    # Equity curves - single plot with all strategies
     ax1 = fig.add_subplot(gs[0, :])
-    plot_equity_curve(dist_returns, title="Equity Curves Comparison", ax=ax1)
-    plot_equity_curve(coint_returns, title="Cointegration Strategy", ax=ax1)
+    colors = plt.cm.tab10(np.linspace(0, 1, num_strategies))
+    for i, (returns, name, color) in enumerate(zip(returns_series, names, colors)):
+        equity = (1 + returns).cumprod()
+        ax1.plot(equity.index, equity.values, linewidth=2, label=name, color=color)
+    ax1.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5)
+    ax1.set_xlabel('Date')
+    ax1.set_ylabel('Cumulative Equity')
     ax1.set_title("Equity Curves Comparison")
-    ax1.legend(['Distance Strategy', 'Cointegration Strategy'])
+    ax1.grid(True, alpha=0.3)
+    ax1.legend()
     
-    # Drawdowns
-    ax2 = fig.add_subplot(gs[1, 0])
-    plot_drawdown(dist_returns, title="Distance Strategy Drawdown", ax=ax2)
+    # Format x-axis dates
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+    ax1.xaxis.set_major_locator(mdates.YearLocator())
+    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45, ha='right')
     
-    ax3 = fig.add_subplot(gs[1, 1])
-    plot_drawdown(coint_returns, title="Cointegration Strategy Drawdown", ax=ax3)
+    # Drawdowns - plot up to 2 strategies side by side, rest below
+    drawdown_axes = []
+    if num_strategies <= 2:
+        # Plot all strategies side by side
+        for i, (returns, name) in enumerate(zip(returns_series[:2], names[:2])):
+            ax = fig.add_subplot(gs[1, i])
+            plot_drawdown(returns, title=f"{name} Drawdown", ax=ax)
+            drawdown_axes.append(ax)
+    else:
+        # Plot first 2 strategies side by side
+        for i in range(2):
+            ax = fig.add_subplot(gs[1, i])
+            plot_drawdown(returns_series[i], title=f"{names[i]} Drawdown", ax=ax)
+            drawdown_axes.append(ax)
+        
+        # Plot remaining strategies in additional rows if needed
+        remaining = num_strategies - 2
+        if remaining > 0:
+            # Add more rows for remaining strategies
+            extra_rows = (remaining + 1) // 2
+            for idx in range(remaining):
+                row = 2 + (idx // 2)
+                col = idx % 2
+                if row < rows - (1 if has_utilization else 0):
+                    ax = fig.add_subplot(gs[row, col])
+                    strategy_idx = idx + 2
+                    plot_drawdown(returns_series[strategy_idx], 
+                                title=f"{names[strategy_idx]} Drawdown", ax=ax)
+                    drawdown_axes.append(ax)
     
     # Utilization (if provided)
-    if dist_util is not None and coint_util is not None:
-        ax4 = fig.add_subplot(gs[2, :])
-        plot_utilization(dist_util, title="Utilization Comparison", ax=ax4)
-        plot_utilization(coint_util, title="Cointegration Utilization", ax=ax4)
-        ax4.set_title("Utilization Comparison")
-        ax4.legend(['Distance Strategy', 'Cointegration Strategy'])
+    if has_utilization:
+        ax_util = fig.add_subplot(gs[-1, :])
+        # Find first non-None utilization or use first returns series index
+        util_index = None
+        for util in utilizations:
+            if util is not None:
+                util_index = util.index
+                break
+        if util_index is None:
+            util_index = returns_series[0].index
+        
+        for i, (util, name, color) in enumerate(zip(utilizations, names, colors)):
+            if util is not None:
+                ax_util.plot(util.index, util.values * 100, 
+                           linewidth=1.5, label=name, color=color)
+        
+        # Add subtle background fill
+        ax_util.axhspan(0, 100, alpha=0.05, color='gray', zorder=0)
+        ax_util.set_xlabel('Date')
+        ax_util.set_ylabel('Utilization (%)')
+        ax_util.set_title("Utilization Comparison")
+        ax_util.set_ylim(0, 100)
+        ax_util.grid(True, alpha=0.3)
+        ax_util.legend()
+        
+        # Format x-axis dates
+        ax_util.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        ax_util.xaxis.set_major_locator(mdates.YearLocator())
+        plt.setp(ax_util.xaxis.get_majorticklabels(), rotation=45, ha='right')
     
     plt.tight_layout()
     return fig
