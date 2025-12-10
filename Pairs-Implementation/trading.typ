@@ -36,7 +36,7 @@ $
 
 If spread is significantly high, then expect reversion downwards, and enter a short position on the spread, which is short on asset $1$ and long on asset $2$:
 $
-  &P O S(X_t) = 0 " and " X_t > M A(X_t) - K dot S D(X_t) \
+  &P O S(X_t) = 0 " and " X_t > M A(X_t) + K dot S D(X_t) \
   &==>P O S(S^1_t) = -C_t / S^1_t " and " P O S(S^2_t) = - hat(beta) dot P O S (S^1_t)
 $
 
